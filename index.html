@@ -9,7 +9,6 @@
     
     <style>
         :root {
-            /* Warna diambil dari gambar referensi Anda */
             --bg-color: #ED5658; /* Merah coral */
             --line-fill: #46C4E9; /* Biru terang */
         }
@@ -41,6 +40,7 @@
             align-items: center;
             width: 85%;
             max-width: 600px;
+            position: relative;
         }
 
         .label {
@@ -57,6 +57,28 @@
             border-radius: 2px;
         }
 
+        /* Titik-titik Milestone (500k, 1jt, dll) */
+        .milestone {
+            position: absolute;
+            top: -2px; /* Posisi titik pas di tengah garis */
+            width: 7px;
+            height: 7px;
+            background-color: white;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
+        .milestone span {
+            position: absolute;
+            top: -24px; /* Teks milestone ada di ATAS garis */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+        }
+
         /* Garis yang sudah terisi */
         .fill {
             position: absolute;
@@ -64,9 +86,10 @@
             left: 0;
             height: 100%;
             background-color: var(--line-fill);
-            width: 0%; /* Akan diisi otomatis oleh data */
+            width: 0%; /* Diisi otomatis oleh data */
             border-radius: 2px;
             transition: width 1.5s ease-in-out;
+            z-index: 2; /* Agar warna biru menutupi titik putih milestone saat lewat */
         }
 
         /* Titik awal */
@@ -79,6 +102,7 @@
             height: 9px;
             background-color: var(--line-fill);
             border-radius: 50%;
+            z-index: 3;
         }
 
         /* Titik Akhir */
@@ -97,7 +121,7 @@
             position: absolute;
             right: 0;
             top: 1.5px;
-            transform: translate(50%, -50%); /* Menempatkan icon pas di ujung garis */
+            transform: translate(50%, -50%); 
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -112,7 +136,7 @@
             filter: drop-shadow(0px 3px 2px rgba(0,0,0,0.15));
         }
 
-        /* Kotak Nominal */
+        /* Kotak Nominal di Bawah Bunga */
         .tooltip {
             margin-top: 10px;
             border: 1.5px solid white;
@@ -124,7 +148,6 @@
             white-space: nowrap;
         }
 
-        /* Segitiga panah ke atas pada kotak */
         .tooltip::before {
             content: '';
             position: absolute;
@@ -147,6 +170,14 @@
         <span class="label">0</span>
         
         <div class="track">
+            
+            <!-- Milestones (Titik dan Angka) -->
+            <div class="milestone" style="left: 20%;"><span>500k</span></div>
+            <div class="milestone" style="left: 40%;"><span>1 jt</span></div>
+            <div class="milestone" style="left: 60%;"><span>1.5 jt</span></div>
+            <div class="milestone" style="left: 80%;"><span>2 jt</span></div>
+
+            <!-- Garis Biru Progress -->
             <div class="fill" id="fill-bar">
                 <div class="marker">
                     
@@ -167,9 +198,11 @@
     </div>
 
     <script>
-        // === MASUKKAN LINK CSV GOOGLE SHEETS ANDA DI SINI ===
-        // Pastikan link-nya berakhiran pub?output=csv
-        const sheetCSVUrl = 'MASUKKAN_LINK_CSV_GOOGLE_SHEETS_DI_SINI'; 
+        // =====================================================================
+        // PENTING: GANTI TULISAN DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS ANDA
+        // Contoh bentuk link yang benar: 'https://docs.google.com/spreadsheets/d/e/2PACX.../pub?output=csv'
+        // =====================================================================
+        const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv'; 
         
         const maxGoal = 2500000; // Target maksimal (2.5 Juta)
 
@@ -185,20 +218,30 @@
 
         async function fetchSheetData() {
             try {
+                // Mencegah error kalau Anda lupa ganti link
+                if(sheetCSVUrl === 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv' || sheetCSVUrl === '') {
+                    document.getElementById('current-amount').innerText = "Link Belum Diganti";
+                    return;
+                }
+
                 const response = await fetch(sheetCSVUrl);
-                if (!response.ok) throw new Error("Gagal load data");
+                if (!response.ok) throw new Error("Gagal load data dari link");
                 
                 const data = await response.text();
                 const rows = data.split('\n');
                 let totalAmount = 0;
 
+                // Melewati baris pertama (header "From,Jumlah")
                 for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].split(',');
-                    if (row.length >= 2) {
+                    // Cari posisi koma pertama pemisah Nama dan Nominal
+                    let firstCommaIndex = rows[i].indexOf(',');
+                    
+                    if (firstCommaIndex !== -1) {
+                        // Ambil semua tulisan SETELAH koma pertama
+                        let amountText = rows[i].substring(firstCommaIndex + 1);
                         
-                        // [PERBAIKAN ERROR]: Kode ini akan membuang otomatis teks "Rp", spasi, 
-                        // maupun titik "." di excel Anda sehingga murni menyisakan angkanya saja.
-                        let cleanText = row[1].replace(/[^0-9]/g, '');
+                        // Sistem HANYA akan mengambil angkanya saja. Titik, koma, kutip, huruf akan dibuang
+                        let cleanText = amountText.replace(/[^0-9]/g, '');
                         const amount = parseInt(cleanText, 10);
                         
                         if (!isNaN(amount)) {
@@ -216,22 +259,21 @@
         }
 
         function updateUI(total) {
-            // Tulis nominal di dalam kotak
+            // Menulis nominal di dalam kotak
             document.getElementById('current-amount').innerText = formatRupiah(total);
 
-            // Hitung persentase untuk menggeser garis & icon bunga
+            // Hitung persentase untuk menggeser garis (maksimal 100%)
             let percentage = (total / maxGoal) * 100;
-            if (percentage > 100) percentage = 100; // Mentok di ujung jika lebih dari 2.5jt
+            if (percentage > 100) percentage = 100; 
             
-            // Beri sedikit jeda agar ada animasi jalan
+            // Animasi jalan bunga
             setTimeout(() => {
                 document.getElementById('fill-bar').style.width = percentage + '%';
             }, 300); 
         }
 
-        if(sheetCSVUrl !== 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv') {
-            fetchSheetData();
-        }
+        // Panggil fungsi langsung
+        fetchSheetData();
     </script>
 </body>
 </html>
