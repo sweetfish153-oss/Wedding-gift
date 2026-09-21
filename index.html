@@ -16,15 +16,15 @@
         body {
             background-color: var(--bg-color);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh; /* Dirubah agar tidak terpotong di HP */
             font-family: Arial, sans-serif;
             color: white;
-            overflow: hidden;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -33,12 +33,13 @@
             font-weight: 700;
             margin-bottom: 90px;
             letter-spacing: 2px;
+            text-align: center;
         }
 
         .progress-container {
             display: flex;
             align-items: center;
-            width: 85%;
+            width: 100%;
             max-width: 600px;
             position: relative;
         }
@@ -60,7 +61,7 @@
         /* Titik-titik Milestone (500k, 1jt, dll) */
         .milestone {
             position: absolute;
-            top: -2px; /* Posisi titik pas di tengah garis */
+            top: -2px; 
             width: 7px;
             height: 7px;
             background-color: white;
@@ -71,7 +72,7 @@
 
         .milestone span {
             position: absolute;
-            top: -24px; /* Teks milestone ada di ATAS garis */
+            top: -24px; 
             left: 50%;
             transform: translateX(-50%);
             font-size: 11px;
@@ -86,10 +87,10 @@
             left: 0;
             height: 100%;
             background-color: var(--line-fill);
-            width: 0%; /* Diisi otomatis oleh data */
+            width: 0%; 
             border-radius: 2px;
             transition: width 1.5s ease-in-out;
-            z-index: 2; /* Agar warna biru menutupi titik putih milestone saat lewat */
+            z-index: 2; 
         }
 
         /* Titik awal */
@@ -160,6 +161,32 @@
             border-top: 1.5px solid white;
             background-color: var(--bg-color);
         }
+
+        /* --- DESAIN RINCIAN BUDGET BARU --- */
+        .budget-details {
+            margin-top: 80px; /* Jarak agar tidak menabrak kotak nominal di atasnya */
+            width: 100%;
+            max-width: 400px; /* Dibuat sedikit lebih kecil dari lebar garis agar manis */
+            text-align: left;
+            background: rgba(255, 255, 255, 0.08); /* Efek transparan sedikit */
+            padding: 20px 25px;
+            border-radius: 12px;
+        }
+
+        .budget-details p {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .budget-details ol {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+        }
     </style>
 </head>
 <body>
@@ -197,10 +224,19 @@
         <span class="label">2.5 jt</span>
     </div>
 
+    <!-- Bagian Rincian Budget -->
+    <div class="budget-details">
+        <p>Rencana budget:</p>
+        <ol>
+            <li>Persiapan Bridal Shower (200k-400k)</li>
+            <li>Tiket bermalam (1jt-2jt)</li>
+        </ol>
+    </div>
+
     <script>
         // =====================================================================
-        // PENTING: GANTI TULISAN DI BAWAH INI DENGAN LINK CSV GOOGLE SHEETS ANDA
-        // Contoh bentuk link yang benar: 'https://docs.google.com/spreadsheets/d/e/2PACX.../pub?output=csv'
+        // MASUKKAN LINK CSV ANDA DI DALAM TANDA KUTIP DI BAWAH INI
+        // Contoh: const sheetCSVUrl = 'https://docs.google.com/spreadsheets/...';
         // =====================================================================
         const sheetCSVUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv'; 
         
@@ -218,7 +254,6 @@
 
         async function fetchSheetData() {
             try {
-                // Langsung tarik data, tidak perlu if lagi
                 const response = await fetch(sheetCSVUrl);
                 if (!response.ok) throw new Error("Gagal load data dari link");
                 
@@ -249,20 +284,16 @@
         }
 
         function updateUI(total) {
-            // Menulis nominal di dalam kotak
             document.getElementById('current-amount').innerText = formatRupiah(total);
 
-            // Hitung persentase untuk menggeser garis (maksimal 100%)
             let percentage = (total / maxGoal) * 100;
             if (percentage > 100) percentage = 100; 
             
-            // Animasi jalan bunga
             setTimeout(() => {
                 document.getElementById('fill-bar').style.width = percentage + '%';
             }, 300); 
         }
 
-        // Panggil fungsi langsung
         fetchSheetData();
     </script>
 </body>
