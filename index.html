@@ -3,181 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Gift Tracker</title>
+    <title>Wedding Gift</title>
+    <!-- Font Cursive (Bersambung) untuk Judul -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Mengambil palet warna dari gambar referensi */
         :root {
-            --sky-blue: #70A0D5;
-            --cloud-cream: #F5EFEB;
-            --tree-blue: #4A83C4;
-            --accent-orange: #F27B5A;
-            --grass-green: #9DC18B;
-            --text-dark: #333333;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Warna diambil dari gambar referensi Anda */
+            --bg-color: #ED5658; /* Merah coral */
+            --line-fill: #46C4E9; /* Biru terang */
         }
 
         body {
-            background-color: var(--sky-blue);
-            color: var(--text-dark);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            /* Latar belakang menyerupai awan dan bukit */
-            background-image: linear-gradient(to bottom, var(--sky-blue) 60%, var(--grass-green) 100%);
-        }
-
-        .card {
-            background-color: var(--cloud-cream);
-            width: 100%;
-            max-width: 450px;
-            border-radius: 16px;
-            padding: 30px 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            position: relative;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: white;
             overflow: hidden;
-        }
-
-        .card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background-color: var(--accent-orange);
         }
 
         h1 {
-            color: var(--tree-blue);
-            font-size: 28px;
-            margin-bottom: 25px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 56px;
             font-weight: 700;
+            margin-bottom: 90px;
+            letter-spacing: 2px;
         }
 
-        .amount-box {
-            background-color: white;
-            border: 2px solid var(--sky-blue);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .amount-box p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .total-amount {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--tree-blue);
-        }
-
-        .goals-container {
-            text-align: left;
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: rgba(157, 193, 139, 0.15); /* light green */
-            border-radius: 12px;
-        }
-
-        .goals-container h3 {
-            font-size: 16px;
-            color: var(--tree-blue);
-            margin-bottom: 10px;
-        }
-
-        .status-text {
-            font-size: 15px;
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-
-        .highlight {
-            font-weight: bold;
-            color: var(--accent-orange);
-        }
-
-        /* Progress Bar Styles */
-        .progress-wrapper {
-            margin-top: 15px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            height: 12px;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background-color: var(--accent-orange);
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        .milestones {
+        .progress-container {
             display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #777;
-            margin-top: 5px;
+            align-items: center;
+            width: 85%;
+            max-width: 600px;
         }
 
-        .loading {
-            font-style: italic;
-            color: #888;
+        .label {
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        .track {
+            flex-grow: 1;
+            height: 3px;
+            background-color: white;
+            margin: 0 15px;
+            position: relative;
+            border-radius: 2px;
+        }
+
+        /* Garis yang sudah terisi */
+        .fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--line-fill);
+            width: 0%; /* Akan diisi otomatis oleh data */
+            border-radius: 2px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        /* Titik awal */
+        .track::before {
+            content: '';
+            position: absolute;
+            left: -4px;
+            top: -3px;
+            width: 9px;
+            height: 9px;
+            background-color: var(--line-fill);
+            border-radius: 50%;
+        }
+
+        /* Titik Akhir */
+        .track::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: -3px;
+            width: 9px;
+            height: 9px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .marker {
+            position: absolute;
+            right: 0;
+            top: 1.5px;
+            transform: translate(50%, -50%); /* Menempatkan icon pas di ujung garis */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Icon Bunga */
+        .flower {
+            width: 38px;
+            height: 38px;
+            fill: white;
+            filter: drop-shadow(0px 3px 2px rgba(0,0,0,0.15));
+        }
+
+        /* Kotak Nominal */
+        .tooltip {
+            margin-top: 10px;
+            border: 1.5px solid white;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 14px;
+            position: relative;
+            background-color: var(--bg-color);
+            white-space: nowrap;
+        }
+
+        /* Segitiga panah ke atas pada kotak */
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            top: -5.5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 8px;
+            height: 8px;
+            border-left: 1.5px solid white;
+            border-top: 1.5px solid white;
+            background-color: var(--bg-color);
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Wedding Gift 💍</h1>
+    <h1>Wedding Gift</h1>
+    
+    <div class="progress-container">
+        <span class="label">0</span>
         
-        <div class="amount-box">
-            <p>Dana Terkumpul</p>
-            <div class="total-amount" id="display-total"><span class="loading">Memuat data...</span></div>
-        </div>
-
-        <div class="goals-container">
-            <h3>Status Target</h3>
-            <div class="status-text" id="display-status">
-                <span class="loading">Menghitung target...</span>
-            </div>
-            
-            <div class="progress-wrapper">
-                <div class="progress-fill" id="progress-bar"></div>
-            </div>
-            <div class="milestones">
-                <span>0</span>
-                <span>1jt</span>
-                <span>1.5jt</span>
-                <span>2jt</span>
-                <span>2.5jt</span>
+        <div class="track">
+            <div class="fill" id="fill-bar">
+                <div class="marker">
+                    
+                    <!-- Icon Bunga Berwarna Putih -->
+                    <svg class="flower" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12,2C10.5,2 9.5,4 9.5,5.5C9.5,6.5 10.2,7.4 11.1,7.8C9.5,7.3 7.5,6.6 6,7.5C4.5,8.4 5.2,10.6 6.3,11.5C7.2,12.2 8.3,12.3 9.4,12C8,12.7 6,13.8 5.5,15.5C5,17.2 7,18.5 8.5,18C10,17.5 11,15.8 11.4,14.6C11.3,16.2 11.4,18.8 12.5,19.5C13.6,20.2 15.5,19.2 16,17.5C16.5,15.8 15.5,14 14.5,13C16,13.8 18.2,14.2 19.5,12.5C20.8,10.8 18.8,9.2 17.5,8.8C16.2,8.4 14.5,9.2 13.5,10C13.8,8.5 14.5,6.2 13.5,5C12.5,3.8 12,2 12,2Z"/>
+                        <circle cx="12" cy="12" r="1.5" fill="#ED5658" />
+                    </svg>
+                    
+                    <!-- Teks Angka yang Terkumpul -->
+                    <div class="tooltip" id="current-amount">Memuat...</div>
+                
+                </div>
             </div>
         </div>
+        
+        <span class="label">2.5 jt</span>
     </div>
 
     <script>
-        // === PENTING: MASUKKAN LINK CSV GOOGLE SHEETS ANDA DI SINI ===
-        // Pastikan format linknya berakhiran pub?output=csv
+        // === MASUKKAN LINK CSV GOOGLE SHEETS ANDA DI SINI ===
+        // Pastikan link-nya berakhiran pub?output=csv
         const sheetCSVUrl = 'MASUKKAN_LINK_CSV_GOOGLE_SHEETS_DI_SINI'; 
+        
+        const maxGoal = 2500000; // Target maksimal (2.5 Juta)
 
-        // Target Goals (dalam Rupiah)
-        const goals = [1000000, 1500000, 2000000, 2500000];
-        const maxGoal = goals[goals.length - 1];
-
-        // Format angka ke Rupiah (Rp)
+        // Format ke Rupiah
         const formatRupiah = (number) => {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
@@ -187,22 +183,24 @@
             }).format(number);
         };
 
-        // Mengambil data dari Google Sheets
         async function fetchSheetData() {
             try {
                 const response = await fetch(sheetCSVUrl);
-                const data = await response.text();
+                if (!response.ok) throw new Error("Gagal load data");
                 
-                // Parse CSV
+                const data = await response.text();
                 const rows = data.split('\n');
                 let totalAmount = 0;
 
-                // Mulai dari baris ke-1 (melewati header "From,Jumlah")
                 for (let i = 1; i < rows.length; i++) {
                     const row = rows[i].split(',');
                     if (row.length >= 2) {
-                        // Bersihkan string dari tanda kutip jika ada, lalu ubah ke angka
-                        const amount = parseFloat(row[1].replace(/["']/g, "").trim());
+                        
+                        // [PERBAIKAN ERROR]: Kode ini akan membuang otomatis teks "Rp", spasi, 
+                        // maupun titik "." di excel Anda sehingga murni menyisakan angkanya saja.
+                        let cleanText = row[1].replace(/[^0-9]/g, '');
+                        const amount = parseInt(cleanText, 10);
+                        
                         if (!isNaN(amount)) {
                             totalAmount += amount;
                         }
@@ -212,43 +210,26 @@
                 updateUI(totalAmount);
 
             } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('display-total').innerHTML = '<span style="color:red; font-size:16px;">Gagal memuat data. Pastikan link CSV benar.</span>';
-                document.getElementById('display-status').innerHTML = '';
+                console.error('Error:', error);
+                document.getElementById('current-amount').innerText = "Cek Link CSV";
             }
         }
 
-        // Memperbarui tampilan Web
         function updateUI(total) {
-            // Tampilkan Total
-            document.getElementById('display-total').innerText = formatRupiah(total);
+            // Tulis nominal di dalam kotak
+            document.getElementById('current-amount').innerText = formatRupiah(total);
 
-            // Cari target terdekat
-            let currentGoal = goals.find(g => g > total);
-            let statusHTML = "";
-
-            if (currentGoal) {
-                let kurang = currentGoal - total;
-                statusHTML = `Target terdekat: <strong>${formatRupiah(currentGoal)}</strong><br>
-                              Kurang <span class="highlight">${formatRupiah(kurang)}</span> lagi!`;
-            } else {
-                statusHTML = `<span class="highlight">Luar Biasa!</span> Semua target pencapaian (${formatRupiah(maxGoal)}) telah terlampaui. Terima kasih! 🎉`;
-                currentGoal = maxGoal; // Untuk kalkulasi progress bar
-            }
-
-            document.getElementById('display-status').innerHTML = statusHTML;
-
-            // Update Progress Bar (Kalkulasi persentase berdasarkan max goal)
+            // Hitung persentase untuk menggeser garis & icon bunga
             let percentage = (total / maxGoal) * 100;
-            if (percentage > 100) percentage = 100;
-            document.getElementById('progress-bar').style.width = percentage + '%';
+            if (percentage > 100) percentage = 100; // Mentok di ujung jika lebih dari 2.5jt
+            
+            // Beri sedikit jeda agar ada animasi jalan
+            setTimeout(() => {
+                document.getElementById('fill-bar').style.width = percentage + '%';
+            }, 300); 
         }
 
-        // Panggil fungsi saat web dimuat
-        if(sheetCSVUrl === 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv') {
-             document.getElementById('display-total').innerHTML = '<span style="color:red; font-size:14px;">Tolong ganti URL CSV di dalam kode terlebih dahulu.</span>';
-             document.getElementById('display-status').innerHTML = '';
-        } else {
+        if(sheetCSVUrl !== 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv') {
             fetchSheetData();
         }
     </script>
