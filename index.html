@@ -218,12 +218,7 @@
 
         async function fetchSheetData() {
             try {
-                // Mencegah error kalau Anda lupa ganti link
-                if(sheetCSVUrl === 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-xE85J8Ehed4EhHAPVT_A9XjyVdtE1CQzjlExaZHesUurZdG3UUNK5nN8HI7rkHKr8QjmtGxHQ6I8/pub?output=csv' || sheetCSVUrl === '') {
-                    document.getElementById('current-amount').innerText = "Link Belum Diganti";
-                    return;
-                }
-
+                // Langsung tarik data, tidak perlu if lagi
                 const response = await fetch(sheetCSVUrl);
                 if (!response.ok) throw new Error("Gagal load data dari link");
                 
@@ -231,16 +226,11 @@
                 const rows = data.split('\n');
                 let totalAmount = 0;
 
-                // Melewati baris pertama (header "From,Jumlah")
                 for (let i = 1; i < rows.length; i++) {
-                    // Cari posisi koma pertama pemisah Nama dan Nominal
                     let firstCommaIndex = rows[i].indexOf(',');
                     
                     if (firstCommaIndex !== -1) {
-                        // Ambil semua tulisan SETELAH koma pertama
                         let amountText = rows[i].substring(firstCommaIndex + 1);
-                        
-                        // Sistem HANYA akan mengambil angkanya saja. Titik, koma, kutip, huruf akan dibuang
                         let cleanText = amountText.replace(/[^0-9]/g, '');
                         const amount = parseInt(cleanText, 10);
                         
